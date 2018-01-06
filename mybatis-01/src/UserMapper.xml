@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间 -->
+<mapper namespace="com.itheima.mybatis.mapper.UserMapper">
+
+<!-- 
+	<select id : statementId
+	parameterType: 输入参数的数据类型
+	parameterMap: Mybatis官方废除了
+	java.lang.Integer: 已被Mybatis 提前起别名
+	resultType: 输出参数的数据类型，自动映射
+	resultMap : 输出参数的数据类型，手动映射
+	？ ：#{} Mybates 占位符的语法
+	#{id}: 输入参数的数据类型如果是基本数据类型的时    #{变量是随意的}
+ -->
+
+	<select id="findUserById" parameterType="Integer" resultType="com.itheima.mybatis.pojo.User">
+		
+		select * from user where id = #{id}
+	
+	</select>
+	
+	<!-- 根据用户名模糊查询 
+	#{}  : 占位符       '小明'  输入参数的数据类型如果为基本类型时   #{变量是随意}     防Sql注入
+	${}  ： 字符串拼接   小明         输入参数的数据类型如果为基本类型时  ${必有是value}   不防
+	
+	-->
+<!-- 	<select id="findUserByUsername" parameterType="String" resultType="com.itheima.mybatis.pojo.User">
+		select * from user where username like '%${value}%'
+	</select> -->
+	<select id="findUserByUsername" parameterType="String" resultType="com.itheima.mybatis.pojo.User">
+		select * from user where username like "%"#{value}"%"
+	</select>
+	
+		<!-- 添加用户
+			 order="AFTER"        Mysql   自增长方式  生成ID  先保存数据 再生成ID
+			 order="BEFORE"       Mysql   UUID  生成ID  先生成ID 再保存数据
+			 order="BEFORE"       Oracle  永远先生成ID 再保存数据
+		 -->
+	<!--  	 
+		<insert id="addUser" parameterType="com.itheima.mybatis.pojo.User">
+			<selectKey keyProperty="id" resultType="Integer" order="AFTER">
+				select LAST_INSERT_ID()
+			</selectKey>
+			insert into user
+			(username,birthday,address,sex)
+			values
+			(#{username},#{birthday},#{address},#{sex})		
+		</insert>
+	-->
+		<insert id="addUser" parameterType="com.itheima.mybatis.pojo.User" useGeneratedKeys="true" keyProperty="id">
+			insert into user
+			(username,birthday,address,sex)
+			values
+			(#{username},#{birthday},#{address},#{sex})	
+		</insert>
+		
+		<!-- 修改用户 -->
+		<update id="updateUserById" parameterType="com.itheima.mybatis.pojo.User">
+			update user set
+				username = #{username}
+				birthday = #{birthday},
+				sex = #{sex},
+				address = #{address}
+			where
+				id = #{id}		
+		</update>
+		
+		<!-- 删除用户 -->
+		<delete id="deleteUserById" parameterType="Integer">
+			delete from
+				 user
+			where
+				id = #{id}
+		</delete>
+</mapper>
